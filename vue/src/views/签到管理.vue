@@ -8,18 +8,7 @@
       <el-col :span="22" class="toolbar" style="padding-bottom: 0px;">
         <el-form :inline="true" :model="filters">
           <el-form-item>
-            <el-select v-model="value" placeholder="请选择你的班课">
-              <el-option
-                v-for="item in optionss"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-                :disabled="item.disabled">
-              </el-option>
-          </el-select>
-          </el-form-item>
-          <el-form-item>
-            <el-input v-model="filters.name" placeholder="请输入成员姓名"></el-input>
+            <el-input v-model="filters.name" placeholder="请输入学生姓名"></el-input>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="search">查找</el-button>
@@ -28,22 +17,20 @@
       </el-col>
       <!-- 列表 -->
       <el-table
-        :data="tableData.filter(data => !filters.name || data.user_name.toString().toLowerCase().includes(filters.name.toLowerCase()))"
+        :data="tableData.filter(data => !filters.name || data.user_account.toString().toLowerCase().includes(filters.name.toLowerCase()))"
         highlight-current-row
         @selection-change="selsChange"
         style="width: 100%;"
         stripe
       >
         <el-table-column type="index" width="60"></el-table-column>
-        <el-table-column prop="id" label="ID" width="100" sortable></el-table-column>
-        <el-table-column prop="user_name" label="姓名" width="100" sortable></el-table-column>
-        <el-table-column prop="user_account" label="账号" width="100" sortable></el-table-column>
-        <el-table-column prop="user_sex" label="性别" width="100" sortable></el-table-column>
-        <el-table-column prop="user_password" label="密码" width="100" sortable></el-table-column>
-        <el-table-column prop="user_tel" label="手机号码" width="120" sortable></el-table-column>
-        <el-table-column prop="user_email" label="电子邮箱" width="150" sortable></el-table-column>
-        <el-table-column prop="user_school" label="所属学校" width="150" sortable></el-table-column>
-        <el-table-column prop="user_college" label="所属学院" width="150" sortable></el-table-column>
+        <el-table-column prop="id" label="所属班课ID" width="150" sortable></el-table-column>
+        <el-table-column prop="user_name" label="任课老师" width="150" sortable></el-table-column>
+        <el-table-column prop="user_account" label="学生姓名" width="150" sortable></el-table-column>
+        <el-table-column prop="user_sex" label="学生ID" width="150" sortable></el-table-column>
+        <el-table-column prop="user_password" label="签到次数" width="150" sortable></el-table-column>
+        <el-table-column prop="user_tel" label="迟到次数" width="150" sortable></el-table-column>
+        <el-table-column prop="user_c" label="未签到次数" width="150" sortable></el-table-column>
         <el-table-column label="管理" width="150">
           <template slot-scope="scope">
             <el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
@@ -57,7 +44,7 @@
         <el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
           <el-row type="flex" class="row-bg">
             <el-col :span="12">
-              <el-form-item label="ID" prop="id">
+              <el-form-item label="所属班课ID" prop="id">
                 <el-input
                   v-model="editForm.id"
                   auto-complete="off"
@@ -66,81 +53,37 @@
                 ></el-input>
               </el-form-item>
             </el-col>
-            <el-form-item label="姓名" prop="user_name">
+            <el-form-item label="任课老师" prop="user_name">
               <el-input v-model="editForm.user_name" style="width:150px;"></el-input>
             </el-form-item>
           </el-row>
           <el-row type="flex" class="row-bg">
             <el-col :span="12">
-              <el-form-item label="账号" prop="user_account">
+              <el-form-item label="学生姓名" prop="user_account">
                 <el-input v-model="editForm.user_account" style="width:150px;"></el-input>
               </el-form-item>
             </el-col>
-            <el-form-item label="密码" prop="user_password">
-              <el-input v-model="editForm.user_password" style="width:150px;"></el-input>
+            <el-form-item label="学生ID" prop="user_sex">
+              <el-input v-model="editForm.user_sex" style="width:150px;"></el-input>
             </el-form-item>
           </el-row>
           <el-row type="flex" class="row-bg">
             <el-col :span="12">
-              <el-form-item label="手机号码" prop="user_tel">
-                <el-input v-model="editForm.user_tel" style="width:150px;"></el-input>
+              <el-form-item label="签到次数" prop="user_password">
+                <el-input v-model="editForm.user_password" style="width:150px;"></el-input>
               </el-form-item>
             </el-col>
-            <el-form-item label="电子邮箱" prop="user_email">
-              <el-input v-model="editForm.user_email" style="width:250px;"></el-input>
+            <el-form-item label="迟到次数" prop="user_tel">
+              <el-input v-model="editForm.user_tel" style="width:250px;"></el-input>
             </el-form-item>
           </el-row>
           <el-row type="flex" class="row-bg">
             <el-col :span="12">
-              <el-form-item label="角色" prop="user_role">
-                <el-select v-model="editForm.user_role" placeholder="请选择角色">
-                  <el-option
-                    v-for="item in options"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                  ></el-option>
-                </el-select>
+              <el-form-item label="未签到次数" prop="user_c">
+                <el-input v-model="editForm.user_c" style="width:250px;"></el-input>
               </el-form-item>
             </el-col>
-            <el-form-item label="生日" prop="user_birthday">
-              <el-date-picker v-model="editForm.user_birthday" type="date" placeholder="选择出生日期"></el-date-picker>
-            </el-form-item>
           </el-row>
-          <el-row type="flex" class="row-bg">
-            <el-col :span="12">
-              <el-form-item label="学号" prop="user_student_ID">
-                <el-input v-model="editForm.user_student_ID" style="width:150px;"></el-input>
-              </el-form-item>
-            </el-col>
-            <el-form-item label="学校" prop="user_school">
-              <el-input v-model="editForm.user_school" style="width:150px;"></el-input>
-            </el-form-item>
-          </el-row>
-          <el-row type="flex" class="row-bg">
-            <el-col :span="12">
-              <el-form-item label="学院" prop="user_college">
-                <el-input v-model="editForm.user_college" style="width:150px;"></el-input>
-              </el-form-item>
-            </el-col>
-            <el-form-item label="专业" prop="user_major">
-              <el-input v-model="editForm.user_major" style="width:150px;"></el-input>
-            </el-form-item>
-          </el-row>
-          <el-row type="flex" class="row-bg">
-            <el-col :span="12">
-              <el-form-item label="年级" prop="user_grade">
-                <el-input v-model="editForm.user_grade" style="width:150px;"></el-input>
-              </el-form-item>
-            </el-col>
-            <el-form-item label="班级" prop="user_class">
-              <el-input v-model="editForm.user_class" style="width:150px;"></el-input>
-            </el-form-item>
-          </el-row>
-          <el-form-item label="性别" prop="user_sex">
-            <el-radio v-model="editForm.user_sex" label="1">男</el-radio>
-            <el-radio v-model="editForm.user_sex" label="2">女</el-radio>
-          </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button @click.native="editFormVisible = false">取消</el-button>
@@ -159,91 +102,46 @@
         <el-form :model="AddForm" label-width="80px" :rules="addFormRules" ref="addForm">
           <el-row type="flex" class="row-bg">
             <el-col :span="12">
-              <el-form-item label="ID" prop="id">
+              <el-form-item label="所属班课ID" prop="id">
                 <el-input
                   v-model="addForm.id"
                   auto-complete="off"
                   style="width:150px;"
                   :disabled="true"
-                  placeholder="系统自动生成"
                 ></el-input>
               </el-form-item>
             </el-col>
-            <el-form-item label="姓名" prop="user_name">
+            <el-form-item label="任课老师" prop="user_name">
               <el-input v-model="addForm.user_name" style="width:150px;"></el-input>
             </el-form-item>
           </el-row>
           <el-row type="flex" class="row-bg">
             <el-col :span="12">
-              <el-form-item label="账号" prop="user_account">
+              <el-form-item label="学生姓名" prop="user_account">
                 <el-input v-model="addForm.user_account" style="width:150px;"></el-input>
               </el-form-item>
             </el-col>
-            <el-form-item label="密码" prop="user_password">
-              <el-input v-model="addForm.user_password" style="width:150px;"></el-input>
+            <el-form-item label="学生ID" prop="user_sex">
+              <el-input v-model="addForm.user_sex" style="width:150px;"></el-input>
             </el-form-item>
           </el-row>
           <el-row type="flex" class="row-bg">
             <el-col :span="12">
-              <el-form-item label="手机号码" prop="user_tel">
-                <el-input v-model="addForm.user_tel" style="width:150px;"></el-input>
+              <el-form-item label="签到次数" prop="user_password">
+                <el-input v-model="addForm.user_password" style="width:150px;"></el-input>
               </el-form-item>
             </el-col>
-            <el-form-item label="电子邮箱" prop="user_email">
-              <el-input v-model="addForm.user_email" style="width:250px;"></el-input>
+            <el-form-item label="迟到次数" prop="user_tel">
+              <el-input v-model="addForm.user_tel" style="width:250px;"></el-input>
             </el-form-item>
           </el-row>
           <el-row type="flex" class="row-bg">
             <el-col :span="12">
-              <el-form-item label="角色" prop="user_role">
-                <el-select v-model="addForm.user_role" placeholder="请选择角色">
-                  <el-option
-                    v-for="item in options"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                  ></el-option>
-                </el-select>
+              <el-form-item label="未签到次数" prop="user_c">
+                <el-input v-model="addForm.user_c" style="width:250px;"></el-input>
               </el-form-item>
             </el-col>
-            <el-form-item label="生日" prop="user_birthday">
-              <el-date-picker v-model="addForm.user_birthday" type="date" placeholder="选择出生日期"></el-date-picker>
-            </el-form-item>
           </el-row>
-          <el-row type="flex" class="row-bg">
-            <el-col :span="12">
-              <el-form-item label="学号" prop="user_student_ID">
-                <el-input v-model="addForm.user_student_ID" style="width:150px;"></el-input>
-              </el-form-item>
-            </el-col>
-            <el-form-item label="学校" prop="user_school">
-              <el-input v-model="addForm.user_school" style="width:150px;"></el-input>
-            </el-form-item>
-          </el-row>
-          <el-row type="flex" class="row-bg">
-            <el-col :span="12">
-              <el-form-item label="学院" prop="user_college">
-                <el-input v-model="addForm.user_college" style="width:150px;"></el-input>
-              </el-form-item>
-            </el-col>
-            <el-form-item label="专业" prop="user_major">
-              <el-input v-model="addForm.user_major" style="width:150px;"></el-input>
-            </el-form-item>
-          </el-row>
-          <el-row type="flex" class="row-bg">
-            <el-col :span="12">
-              <el-form-item label="年级" prop="user_grade">
-                <el-input v-model="addForm.user_grade" style="width:150px;"></el-input>
-              </el-form-item>
-            </el-col>
-            <el-form-item label="班级" prop="user_class">
-              <el-input v-model="addForm.user_class" style="width:150px;"></el-input>
-            </el-form-item>
-          </el-row>
-          <el-form-item label="性别" prop="user_sex">
-            <el-radio v-model="addForm.user_sex" label="1">男</el-radio>
-            <el-radio v-model="addForm.user_sex" label="2">女</el-radio>
-          </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button @click.native="addFormVisible = false">取消</el-button>
@@ -256,50 +154,29 @@
 
 <script>
 export default {
-  name: "ClassUser",
   data () {
     return {
       filters: {
         name: ''
       },
-      optionss: [{
-        value: '选项1',
-        label: '数据结构'
-      }, {
-        value: '选项2',
-        label: '计算机网络'
-      }, {
-        value: '选项3',
-        label: '算法'
-      }, {
-        value: '选项4',
-        label: '工程实践'
-      }],
-      value: '',
       tableData: [
         {
-          id: '10086',
+          id: '12345',
           user_name: '王小虎',
-          user_account: 'admin',
-          user_sex: '男',
-          user_password: '123456',
-          user_tel: '15860659635',
-          user_email: '16156165@qq.com',
-          user_school: '福州大学',
-          user_college: '数计学院',
-          user_role: '超级管理员'
+          user_account: '小红',
+          user_sex: '1351651',
+          user_password: '2',
+          user_tel: '3',
+          user_c: '2'
         },
         {
-          id: '12345',
-          user_name: '小李',
-          user_account: 'xiaoli',
-          user_sex: '男',
-          user_password: '654321',
-          user_tel: '12345678910',
-          user_email: '165165@qq.com',
-          user_school: '福州大学',
-          user_college: '数计学院',
-          user_role: '教师'
+          id: '654321',
+          user_name: '王小虎',
+          user_account: '小昌',
+          user_sex: '1351651',
+          user_password: '1',
+          user_tel: '2',
+          user_c: '0'
         }
       ],
       users: [],
