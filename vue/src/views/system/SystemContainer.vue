@@ -1,11 +1,11 @@
 <template>
   <div>
-    学校 院系专业
+    <router-view />
   </div>
 </template>
 <script type="text/ecmascript-6">
 export default {
-  name: "SchoolSetting",
+  name: "SystemContainer",
   data(){
     return {}
   }

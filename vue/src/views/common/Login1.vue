@@ -1,11 +1,11 @@
 <template>
   <div>
-    姓名 手机号(账号) 性别 出生年月 身份 学号/工号 学校 所在院系 编辑
+    Login page 手机号 密码 30天内自动登录 忘记密码 登录 注册
   </div>
 </template>
 <script type="text/ecmascript-6">
 export default {
-  name: "UserData",
+  name: "Login",
   data(){
     return {}
   }
