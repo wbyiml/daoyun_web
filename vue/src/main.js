@@ -49,7 +49,8 @@ router.beforeEach((to, from, next) => {
   }
 })
 
-router.afterEach((to, from, next) => {
+// router.afterEach((to, from, next) => {
+router.afterEach((to) => {
   var routerList = to.matched
   store.commit('setCrumbList', routerList)
   store.commit('permission/SET_CURRENT_MENU', to.name)
