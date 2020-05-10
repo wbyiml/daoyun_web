@@ -1,698 +1,301 @@
 <template>
   <div>
-    <section>
-      <!-- 工具条 -->
-      <el-col :span="2" class="toolbar" style="padding-bottom: 0px;">
-        <el-button type="primary" @click="handleAdd">新增</el-button>
-      </el-col>
-      <el-col :span="22" class="toolbar" style="padding-bottom: 0px;">
-        <el-form :inline="true" :model="filters">
-          <el-form-item>
-            <el-input
-              v-model="filters.name"
-              placeholder="请输入姓名"
-            ></el-input>
-          </el-form-item>
-          <el-form-item>
-            <el-button type="primary" @click="search">查找</el-button>
-          </el-form-item>
-        </el-form>
-      </el-col>
-      <!-- 列表 -->
+    <!-- 工具条 -->
+    <div style="margin:20px;">
+      <label>信息过滤</label>
+
+      <div style="margin:20px">
+        <span>
+          <label>姓名</label>
+          <el-input v-model="searchName" placeholder="请输入姓名" style="width:300px" size="small"></el-input>
+        </span>
+        <span>
+          <label  style="margin-left:50px">身份</label> 
+          <el-input v-model="searchIdentity" placeholder="请输入身份" style="width:300px" size="small"></el-input>
+        </span>
+      </div>
+      <div  style="margin:20px">
+        <span>
+          <label>学校</label>
+          <el-input v-model="searchSchoolName" placeholder="请输入学校" style="width:300px" size="small"></el-input>
+        </span>
+        <span>
+          <label  style="margin-left:50px">学院</label>
+          <el-input v-model="searchFacultyName" placeholder="请输入学院" style="width:300px" size="small"></el-input>
+        </span>
+      </div>
+      <div  style="margin:20px">
+        <span>
+          <label>专业</label>
+          <el-input v-model="searchMajorName" placeholder="请输入专业" style="width:300px" size="small"></el-input>
+        </span>
+        <span>
+          <label  style="margin-left:50px">学号/工号</label>
+          <el-input v-model="searchStudentNumber" placeholder="请输入学号/工号" style="width:300px" size="small"></el-input>
+        </span>
+      </div>
+
+    </div>
+
+    <!-- 用户列表 -->
+    <div>
       <el-table
-        :data="
-          tableData.filter(
-            data =>
-              !filters.name ||
-              data.user_name
-                .toString()
-                .toLowerCase()
-                .includes(filters.name.toLowerCase())
-          )
-        "
-        highlight-current-row
-        @selection-change="selsChange"
-        style="width: 100%;"
-        stripe
+      :data="UserTableData.filter(data => (!searchName || data.name.toLowerCase().includes(searchName.toLowerCase())) &&
+                                          (!searchIdentity || data.identity.toLowerCase().includes(searchIdentity.toLowerCase())) &&
+                                          (!searchSchoolName || data.school_name.toLowerCase().includes(searchSchoolName.toLowerCase())) &&
+                                          (!searchFacultyName || data.faculty_name.toLowerCase().includes(searchFacultyName.toLowerCase())) &&
+                                          (!searchMajorName || data.major_name.toLowerCase().includes(searchMajorName.toLowerCase())) &&
+                                          (!searchStudentNumber || data.student_number.toLowerCase().includes(searchStudentNumber.toLowerCase())) 
+                                  )"
+      stripe border style="width: 100%"
       >
-        <el-table-column type="index" width="60"></el-table-column>
         <el-table-column
-          prop="id"
-          label="ID"
-          width="150"
-          sortable
-        ></el-table-column>
-        <el-table-column
-          prop="user_name"
+          prop="name"
           label="姓名"
-          width="150"
-          sortable
-        ></el-table-column>
+          sortable>
+        </el-table-column>
         <el-table-column
-          prop="user_account"
-          label="账号"
-          width="150"
-          sortable
-        ></el-table-column>
+          prop="identity"
+          label="身份"
+          sortable>
+        </el-table-column>
         <el-table-column
-          prop="user_password"
-          label="密码"
-          width="150"
-          sortable
-        ></el-table-column>
+          prop="school_name"
+          label="学校"
+          sortable>
+        </el-table-column>
         <el-table-column
-          prop="user_tel"
-          label="手机号码"
-          width="150"
-          sortable
-        ></el-table-column>
+          prop="faculty_name"
+          label="学院"
+          sortable>
+        </el-table-column>
         <el-table-column
-          prop="user_email"
-          label="电子邮箱"
-          width="150"
-          sortable
-        ></el-table-column>
+          prop="major_name"
+          label="专业"
+          sortable>
+        </el-table-column>
         <el-table-column
-          prop="user_role"
+          prop="student_number"
+          label="学号/工号"
+          sortable>
+        </el-table-column>
+        <el-table-column
           label="角色"
-          width="150"
-          sortable
-        ></el-table-column>
-        <el-table-column label="管理" width="150">
+          width="200"
+        >
           <template slot-scope="scope">
-            <el-button size="small" @click="handleEdit(scope.$index, scope.row)"
-              >编辑</el-button
-            >
+            <el-select v-model="scope.row.roles" multiple placeholder="请选择" @change="modified=true">
+              <el-option
+                v-for="item in Roles"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id">
+              </el-option>
+            </el-select>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作">
+          <template slot-scope="scope">
             <el-button
-              type="danger"
-              size="small"
-              @click="handleDel(scope.$index, scope.row)"
-              >删除</el-button
-            >
+              size="mini"
+              @click="handleUserDetail(scope.row)">详细信息</el-button>
           </template>
         </el-table-column>
       </el-table>
+    </div>
 
-      <!--编辑界面-->
-      <el-dialog
-        title="编辑"
-        :visible.sync="editFormVisible"
-        :close-on-click-modal="false"
-        center
-      >
-        <el-form
-          :model="editForm"
-          label-width="80px"
-          :rules="editFormRules"
-          ref="editForm"
-        >
-          <el-row type="flex" class="row-bg">
-            <el-col :span="12">
-              <el-form-item label="ID" prop="id">
-                <el-input
-                  v-model="editForm.id"
-                  auto-complete="off"
-                  style="width:150px;"
-                  :disabled="true"
-                ></el-input>
-              </el-form-item>
-            </el-col>
-            <el-form-item label="姓名" prop="user_name">
-              <el-input
-                v-model="editForm.user_name"
-                style="width:150px;"
-              ></el-input>
-            </el-form-item>
-          </el-row>
-          <el-row type="flex" class="row-bg">
-            <el-col :span="12">
-              <el-form-item label="账号" prop="user_account">
-                <el-input
-                  v-model="editForm.user_account"
-                  style="width:150px;"
-                ></el-input>
-              </el-form-item>
-            </el-col>
-            <el-form-item label="密码" prop="user_password">
-              <el-input
-                v-model="editForm.user_password"
-                style="width:150px;"
-              ></el-input>
-            </el-form-item>
-          </el-row>
-          <el-row type="flex" class="row-bg">
-            <el-col :span="12">
-              <el-form-item label="手机号码" prop="user_tel">
-                <el-input
-                  v-model="editForm.user_tel"
-                  style="width:150px;"
-                ></el-input>
-              </el-form-item>
-            </el-col>
-            <el-form-item label="电子邮箱" prop="user_email">
-              <el-input
-                v-model="editForm.user_email"
-                style="width:250px;"
-              ></el-input>
-            </el-form-item>
-          </el-row>
-          <el-row type="flex" class="row-bg">
-            <el-col :span="12">
-              <el-form-item label="角色" prop="user_role">
-                <el-select
-                  v-model="editForm.user_role"
-                  placeholder="请选择角色"
-                >
-                  <el-option
-                    v-for="item in options"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                  ></el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-form-item label="生日" prop="user_birthday">
-              <el-date-picker
-                v-model="editForm.user_birthday"
-                type="date"
-                placeholder="选择出生日期"
-              ></el-date-picker>
-            </el-form-item>
-          </el-row>
-          <el-row type="flex" class="row-bg">
-            <el-col :span="12">
-              <el-form-item label="学号" prop="user_student_ID">
-                <el-input
-                  v-model="editForm.user_student_ID"
-                  style="width:150px;"
-                ></el-input>
-              </el-form-item>
-            </el-col>
-            <el-form-item label="学校" prop="user_school">
-              <el-input
-                v-model="editForm.user_school"
-                style="width:150px;"
-              ></el-input>
-            </el-form-item>
-          </el-row>
-          <el-row type="flex" class="row-bg">
-            <el-col :span="12">
-              <el-form-item label="学院" prop="user_college">
-                <el-input
-                  v-model="editForm.user_college"
-                  style="width:150px;"
-                ></el-input>
-              </el-form-item>
-            </el-col>
-            <el-form-item label="专业" prop="user_major">
-              <el-input
-                v-model="editForm.user_major"
-                style="width:150px;"
-              ></el-input>
-            </el-form-item>
-          </el-row>
-          <el-row type="flex" class="row-bg">
-            <el-col :span="12">
-              <el-form-item label="年级" prop="user_grade">
-                <el-input
-                  v-model="editForm.user_grade"
-                  style="width:150px;"
-                ></el-input>
-              </el-form-item>
-            </el-col>
-            <el-form-item label="班级" prop="user_class">
-              <el-input
-                v-model="editForm.user_class"
-                style="width:150px;"
-              ></el-input>
-            </el-form-item>
-          </el-row>
-          <el-form-item label="性别" prop="user_sex">
-            <el-radio v-model="editForm.user_sex" label="1">男</el-radio>
-            <el-radio v-model="editForm.user_sex" label="2">女</el-radio>
-          </el-form-item>
-        </el-form>
-        <div slot="footer" class="dialog-footer">
-          <el-button @click.native="editFormVisible = false">取消</el-button>
-          <el-button type="primary" @click.native="editSubmit">提交</el-button>
-        </div>
-      </el-dialog>
+    <div style="margin:50px 500px" v-if="modified">
+      <el-button type="primary"  @click="undoModify()">
+        撤销修改
+      </el-button>
+      <el-button type="primary" style="margin-left:50px" @click="confirmModify()">
+        保存修改
+      </el-button>
+    </div>
 
-      <!--新增界面-->
-      <el-dialog
-        title="新增"
-        :visible.sync="addFormVisible"
-        :close-on-click-modal="false"
-        center
-        v-if="addFormVisible"
-      >
-        <el-form
-          :model="AddForm"
-          label-width="80px"
-          :rules="addFormRules"
-          ref="addForm"
-        >
-          <el-row type="flex" class="row-bg">
-            <el-col :span="12">
-              <el-form-item label="ID" prop="id">
-                <el-input
-                  v-model="addForm.id"
-                  auto-complete="off"
-                  style="width:150px;"
-                  :disabled="true"
-                  placeholder="系统自动生成"
-                ></el-input>
-              </el-form-item>
-            </el-col>
-            <el-form-item label="姓名" prop="user_name">
-              <el-input
-                v-model="addForm.user_name"
-                style="width:150px;"
-              ></el-input>
-            </el-form-item>
-          </el-row>
-          <el-row type="flex" class="row-bg">
-            <el-col :span="12">
-              <el-form-item label="账号" prop="user_account">
-                <el-input
-                  v-model="addForm.user_account"
-                  style="width:150px;"
-                ></el-input>
-              </el-form-item>
-            </el-col>
-            <el-form-item label="密码" prop="user_password">
-              <el-input
-                v-model="addForm.user_password"
-                style="width:150px;"
-              ></el-input>
-            </el-form-item>
-          </el-row>
-          <el-row type="flex" class="row-bg">
-            <el-col :span="12">
-              <el-form-item label="手机号码" prop="user_tel">
-                <el-input
-                  v-model="addForm.user_tel"
-                  style="width:150px;"
-                ></el-input>
-              </el-form-item>
-            </el-col>
-            <el-form-item label="电子邮箱" prop="user_email">
-              <el-input
-                v-model="addForm.user_email"
-                style="width:250px;"
-              ></el-input>
-            </el-form-item>
-          </el-row>
-          <el-row type="flex" class="row-bg">
-            <el-col :span="12">
-              <el-form-item label="角色" prop="user_role">
-                <el-select v-model="addForm.user_role" placeholder="请选择角色">
-                  <el-option
-                    v-for="item in options"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                  ></el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-form-item label="生日" prop="user_birthday">
-              <el-date-picker
-                v-model="addForm.user_birthday"
-                type="date"
-                placeholder="选择出生日期"
-              ></el-date-picker>
-            </el-form-item>
-          </el-row>
-          <el-row type="flex" class="row-bg">
-            <el-col :span="12">
-              <el-form-item label="学号" prop="user_student_ID">
-                <el-input
-                  v-model="addForm.user_student_ID"
-                  style="width:150px;"
-                ></el-input>
-              </el-form-item>
-            </el-col>
-            <el-form-item label="学校" prop="user_school">
-              <el-input
-                v-model="addForm.user_school"
-                style="width:150px;"
-              ></el-input>
-            </el-form-item>
-          </el-row>
-          <el-row type="flex" class="row-bg">
-            <el-col :span="12">
-              <el-form-item label="学院" prop="user_college">
-                <el-input
-                  v-model="addForm.user_college"
-                  style="width:150px;"
-                ></el-input>
-              </el-form-item>
-            </el-col>
-            <el-form-item label="专业" prop="user_major">
-              <el-input
-                v-model="addForm.user_major"
-                style="width:150px;"
-              ></el-input>
-            </el-form-item>
-          </el-row>
-          <el-row type="flex" class="row-bg">
-            <el-col :span="12">
-              <el-form-item label="年级" prop="user_grade">
-                <el-input
-                  v-model="addForm.user_grade"
-                  style="width:150px;"
-                ></el-input>
-              </el-form-item>
-            </el-col>
-            <el-form-item label="班级" prop="user_class">
-              <el-input
-                v-model="addForm.user_class"
-                style="width:150px;"
-              ></el-input>
-            </el-form-item>
-          </el-row>
-          <el-form-item label="性别" prop="user_sex">
-            <el-radio v-model="addForm.user_sex" label="1">男</el-radio>
-            <el-radio v-model="addForm.user_sex" label="2">女</el-radio>
-          </el-form-item>
-        </el-form>
-        <div slot="footer" class="dialog-footer">
-          <el-button @click.native="addFormVisible = false">取消</el-button>
-          <el-button type="primary" @click.native="addSubmit">提交</el-button>
-        </div>
-      </el-dialog>
-    </section>
+    每个用户拥有的角色    ||    每个角色对应的用户
+
+    <!--详细信息-->
+    <el-dialog
+      title="详细信息"
+      :visible.sync="userDetailVisible"
+      center
+    >
+      <div>
+        <label style="display:inline-block;width:100px;">姓名</label><label>{{userDetail.name}}</label>
+      </div>
+      <div>
+        <label style="display:inline-block;width:100px;">性别</label><label>{{userDetail.sex}}</label>
+      </div>
+      <div>
+        <label style="display:inline-block;width:100px;">出生日期</label><label>{{userDetail.birthday}}</label>
+      </div>
+      <div>
+        <label style="display:inline-block;width:100px;">手机</label><label>{{userDetail.phone}}</label>
+      </div>
+      <div>
+        <label style="display:inline-block;width:100px;">邮箱</label><label>{{userDetail.emsil}}</label>
+      </div>
+      <div>
+        <label style="display:inline-block;width:100px;">身份</label><label>{{userDetail.identity}}</label>
+      </div>
+      <div>
+        <label style="display:inline-block;width:100px;">学号/工号</label><label>{{userDetail.student_number}}</label>
+      </div>
+      <div>
+        <label style="display:inline-block;width:100px;">学校</label><label>{{userDetail.school_name}}</label>
+      </div>
+      <div>
+        <label style="display:inline-block;width:100px;">学院</label><label>{{userDetail.faculty_name}}</label>
+      </div>
+      <div>
+        <label style="display:inline-block;width:100px;">专业</label><label>{{userDetail.major_name}}</label>
+      </div>
+      <div>
+        <label style="display:inline-block;width:100px;">用户名</label><label>{{userDetail.user_name}}</label>
+      </div>
+    </el-dialog>
+
   </div>
 </template>
-
-<script>
+<script type="text/ecmascript-6">
 export default {
-  name: "UserManage",
   data() {
     return {
-      filters: {
-        name: ""
-      },
-      tableData: [
-        {
-          id: "10086",
-          user_name: "王小虎",
-          user_account: "admin",
-          user_password: "123456",
-          user_tel: "15860659635",
-          user_email: "16156165@qq.com",
-          user_role: "超级管理员"
-        },
-        {
-          id: "12345",
-          user_name: "小李",
-          user_account: "xiaoli",
-          user_password: "654321",
-          user_tel: "12345678910",
-          user_email: "165165@qq.com",
-          user_role: "教师"
-        }
-      ],
-      users: [],
-      page: 1,
-      //   listLoading: false,
-      sels: [], //列表选中列
+      searchName: '',
+      searchIdentity: '',
+      searchSchoolName: '',
+      searchFacultyName: '',
+      searchMajorName: '',
+      searchStudentNumber: '',
 
-      editFormVisible: false, //编辑界面是否显示
-      //   editLoading: false,
-      editFormRules: {
-        user_name: [
-          { required: true, message: "请输入姓名", trigger: "change" }
-        ],
-        user_account: [
-          { required: true, message: "请输入账号", trigger: "change" }
-        ],
-        user_password: [
-          { required: true, message: "请输入密码", trigger: "change" }
-        ],
-        user_tel: [
-          { required: true, message: "请输入手机号码", trigger: "change" }
-        ],
-        user_email: [
-          { required: true, message: "请输入电子邮箱", trigger: "change" }
-        ],
-        user_role: [
-          { required: true, message: "请选择角色", trigger: "change" }
-        ],
-        user_student_ID: [
-          { required: true, message: "请输入学号", trigger: "change" }
-        ],
-        user_school: [
-          { required: true, message: "请输入学校", trigger: "change" }
-        ],
-        user_college: [
-          { required: true, message: "请输入学院", trigger: "change" }
-        ],
-        user_major: [
-          { required: true, message: "请输入专业", trigger: "change" }
-        ],
-        user_grade: [
-          { required: true, message: "请输入年级", trigger: "change" }
-        ],
-        user_class: [
-          { required: true, message: "请输入班级", trigger: "change" }
-        ],
-        user_birthday: [
-          { required: true, message: "请选择生日", trigger: "change" }
-        ],
-        user_sex: [{ required: true, message: "请选择性别", trigger: "change" }]
-      },
-      //编辑界面数据
-      editForm: {
-        id: "",
-        user_name: "",
-        user_account: "",
-        user_password: "",
-        user_tel: "",
-        user_email: "",
-        user_role: "",
-        user_student_ID: "",
-        user_school: "",
-        user_college: "",
-        user_major: "",
-        user_grade: "",
-        user_class: "",
-        user_birthday: "",
-        user_sex: ""
-      },
-      options: [
-        {
-          value: "1",
-          label: "学生"
-        },
-        {
-          value: "2",
-          label: "教师"
-        },
-        {
-          value: "3",
-          label: "超级管理员"
-        }
-      ],
-      addFormVisible: false, //新增界面是否显示
-      addFormRules: {
-        user_name: [
-          { required: true, message: "请输入姓名", trigger: "change" }
-        ],
-        user_account: [
-          { required: true, message: "请输入账号", trigger: "change" }
-        ],
-        user_password: [
-          { required: true, message: "请输入密码", trigger: "change" }
-        ],
-        user_tel: [
-          { required: true, message: "请输入手机号码", trigger: "change" }
-        ],
-        user_email: [
-          { required: true, message: "请输入电子邮箱", trigger: "change" }
-        ],
-        user_role: [
-          { required: true, message: "请选择角色", trigger: "change" }
-        ],
-        user_student_ID: [
-          { required: true, message: "请输入学号", trigger: "change" }
-        ],
-        user_school: [
-          { required: true, message: "请输入学校", trigger: "change" }
-        ],
-        user_college: [
-          { required: true, message: "请输入学院", trigger: "change" }
-        ],
-        user_major: [
-          { required: true, message: "请输入专业", trigger: "change" }
-        ],
-        user_grade: [
-          { required: true, message: "请输入年级", trigger: "change" }
-        ],
-        user_class: [
-          { required: true, message: "请输入班级", trigger: "change" }
-        ],
-        user_birthday: [
-          { required: true, message: "请选择生日", trigger: "change" }
-        ],
-        user_sex: [{ required: true, message: "请选择性别", trigger: "change" }]
-      },
-      //新增界面数据
-      addForm: {
-        id: "",
-        user_name: "",
-        user_account: "",
-        user_password: "",
-        user_tel: "",
-        user_email: "",
-        user_role: "",
-        user_student_ID: "",
-        user_school: "",
-        user_college: "",
-        user_major: "",
-        user_grade: "",
-        user_class: "",
-        user_birthday: "",
-        user_sex: ""
-      }
+      UserTableData: [],
+      Roles:[],
+
+      userDetail: {},
+      userDetailVisible: false,
+
+      modified: false,
     };
   },
   methods: {
-    handleEdit: function(index, row) {
-      this.id = row.id;
-      this.editFormVisible = true;
-      this.editForm = Object.assign({}, row);
-    }, //实际编辑要请求数据库数据
+    handleUserDetail(row){
+      console.log(row)
+      this.userDetail = row;
+      this.userDetailVisible = true;
+    },
 
-    editSubmit: function() {
-      /*       this.$refs["editForm"].validate(valid => {
-        if (valid) {
-          this.axios({
-            method: "POST",
-            url: "http://localhost:8686/ssm/User/updateOrderForAdmin",
-            data: {
-              id: this.id,
-              user_name: this.editForm.user_name,
-              user_account: this.editForm.user_account,
-              user_password: this.editForm.user_password,
-              user_tel: this.editForm.user_tel,
-              user_email: this.editForm.user_email,
-              user_role: this.editForm.user_role,
-              completed: this.editForm.completed
+    //撤销修改
+    undoModify(){
+        let _this = this
+        try {
+          // 加载用户
+          this.$axios.get(this.$serverUrl+'/api/getAllUserRoles')
+          .then(function (response) {
+            let j = 0;
+            let userRoles = response.data.userRoles.rows;
+            for(let i=0;i<_this.UserTableData.length;i++){
+              _this.UserTableData[i].roles = [];
+              while(_this.UserTableData[i].id > userRoles[j].user_id){
+                j++;
+              }
+              if(_this.UserTableData[i].id == userRoles[j].user_id){
+                _this.UserTableData[i].roles.push(userRoles[j].user_id);
+              }
             }
-          }).then(res => {
-            if (res.data.status == "success") {
-              this.listOrderForAdmin();
-              this.$message({
-                message: "编辑成功",
-                type: "success"
-              });
-            }
-            if (res.data.status == "someerror") {
-              this.$message({
-                message: "编辑失败",
-                type: "warning"
-              });
-            }
-          });
-          this.editFormVisible = false;
+            console.log(_this.UserTableData);   
+            _this.modified = false;
+          })
+          .catch(function (error) {
+            console.log(error);
+          }); 
+        } catch (e) {
+            console.log(e)
         }
-      }); */
-      this.editFormVisible = false;
     },
-    handleAdd: function() {
-      this.addFormVisible = true;
-    },
-    addSubmit: function() {
-      /*      this.$refs["addForm"].validate(valid => {
-        if (valid) {
-          this.axios({
-            method: "POST",
-            url: "http://localhost:8686/ssm/User/insertOrderForAdmin",
-            data: {
-              id: this.addForm.id,
-              user_name: this.addForm.user_name,
-              user_account: this.addForm.user_account,
-              user_password: this.addForm.user_password,
-              user_tel: this.addForm.user_tel,
-              user_email: this.addForm.user_email,
-              user_role: this.addForm.user_role,
-              completed: this.addForm.completed
-            }
-          }).then(res => {
-            if (res.data.status == "success") {
-              this.listOrderForAdmin();
-              this.$message({
-                message: "添加成功",
-                type: "success"
-              });
-              this.$refs["addForm"].resetFields();
-            }
-            if (res.data.status == "someerror") {
-              this.$message({
-                message: "添加失败",
-                type: "warning"
-              });
-            }
-          });
-          this.addFormVisible = false;
+    //确认修改
+    confirmModify(){
+      let pairs = [];
+      for(let i=0;i<this.UserTableData.length;i++){
+        for(let j=0;j<this.UserTableData[i].roles.length;j++){
+          pairs.push({
+            'user_id': this.UserTableData[i].id,
+            'role_id': this.UserTableData[i].roles[j] //把select value改成json string ,roles在这转成json  role_id  role_name
+          })
         }
-      }); */
-      this.addFormVisible = false;
+      }
+
+      let _this = this;
+      try {
+          this.$axios.post(this.$serverUrl+'/api/updateAllUserRole', {
+            'pairs': pairs,
+          })
+          .then(function (response) {
+            console.log(response);
+            _this.modified = false;
+            _this.$message({
+              showClose: true,
+              message: '保存成功',
+              type: 'success'
+            });
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      } catch (e) {
+          console.log(e)
+      }
+
+    },
+    
+
+  },
+  //初始化页面完成后,再对dom节点进行相关操作
+  mounted() {
+    try {
+      const _this = this;
+      
+      // 加载用户
+      this.$axios.get(this.$serverUrl+'/api/getAllUsers')
+      .then(function (response) {
+        // console.log(response.data.users.rows);
+        _this.UserTableData = response.data.users.rows;
+        // 加载用户角色
+        return _this.$axios.get(_this.$serverUrl+'/api/getAllUserRoles')
+      })
+      .then(function (response) {
+        // console.log(response.data.userRoles.rows);
+        let j = 0;
+        let userRoles = response.data.userRoles.rows;
+        for(let i=0;i<_this.UserTableData.length;i++){
+          _this.UserTableData[i].roles = [];
+          while(_this.UserTableData[i].id > userRoles[j].user_id){
+            j++;
+          }
+          if(_this.UserTableData[i].id == userRoles[j].user_id){
+            _this.UserTableData[i].roles.push(userRoles[j].role_id);
+          }
+        }
+        console.log(_this.UserTableData);
+      })
+      .catch(function (error) {
+        console.log(error);
+      }); 
+
+      // 加载角色
+      this.$axios.get(this.$serverUrl+'/api/getAllRoles')
+      .then(function (response) {
+        // console.log(response.data.roles.rows);
+        _this.Roles = response.data.roles.rows;
+        
+      })
+      .catch(function (error) {
+        console.log(error);
+      }); 
+
+    } catch (e) {
+        console.log(e)
     }
-
-    //删除这条数据
-
-    /*     handleDel(index, row) {
-      this.axios({
-        method: "POST",
-        url: "http://localhost:8686/ssm/User/deleteOrderForAdmin",
-        data: {
-          id: row.id
-        }
-      }).then(res => {
-        if (res.data.status == "success") {
-          this.listOrderForAdmin();
-          this.$message({
-            message: "删除成功",
-            type: "success"
-          });
-        }
-        if (res.data.status == "someerror") {
-          this.$message({
-            message: "删除失败",
-            type: "warning"
-          });
-        }
-      });
-    }, */
-
-    //数据库获取数据
-
-    /*  listOrderForAdmin() {
-      this.axios({
-        method: "POST",
-        url: "http://localhost:8686/ssm/User/listOrderForAdmin",
-        data: {
-          s: 0
-        }
-      }).then(res => {
-        if (res.data.status == "success") {
-          this.tableData = res.data.orderData;
-        }
-        if (res.data.status == "someerror") {
-          this.$message({
-            message: "获取数据失败",
-            type: "warning"
-          });
-        }
-      });
-    } */
   }
-  /*   mounted() {
-    this.listOrderForAdmin();
-  } */
-};
+}
 </script>

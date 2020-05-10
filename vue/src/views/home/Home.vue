@@ -113,7 +113,7 @@ export default {
       },
       logout(){
         this.$store.commit('LOGIN_OUT')
-          /* 防止切换角色时addRoutes重复添加路由导致出现警告 */
+          /* 防止切换角色时addRoutes重复添加路由导致出现警告 */ 
           console.log('logout')
           window.location.reload()
       }

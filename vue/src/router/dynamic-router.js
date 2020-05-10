@@ -12,7 +12,7 @@ const RoleManage = () => import('../views/system/RoleManage.vue')
 const UserManage = () => import('../views/system/UserManage.vue')
 const DictionaryManage = () => import('../views/system/DictionaryManage.vue')
 const SchoolSetting = () => import('../views/system/SchoolSetting.vue')
-const ExperienceLevelSetting = () => import('../views/system/ExperienceLevelSetting.vue')
+const SystemParameterSetting = () => import('../views/system/SystemParameterSetting.vue')
 
 
 /* 需要权限判断的路由 */
@@ -166,11 +166,11 @@ const dynamicRoutes = [
             },
             //二级菜单
             {
-                path: 'ExperienceLevelSetting',
-                component: ExperienceLevelSetting,
-                name: 'ExperienceLevelSetting',
+                path: 'SystemParameterSetting',
+                component: SystemParameterSetting,
+                name: 'SystemParameterSetting',
                 meta: {
-                    name: '经验等级设置',
+                    name: '系统参数设置',
                     icon:'',
                     isMenu:'True',
                     isPage:'True'

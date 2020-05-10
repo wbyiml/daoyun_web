@@ -1,371 +1,214 @@
 <template>
-  <div>
-    <div class="background">
-      <img src="../../assets/login.jpg" style="width:100% height:50%" />
-      <div class="loginblock">
-        <div class="logintitle">
-          <span>D&nbsp;a&nbsp;o&nbsp;Y&nbsp;u&nbsp;n</span>
-        </div>
-        <div style="font-size:30px">后台管理系统</div>
-        <el-divider></el-divider>
-        <div class="inputzm">
-          <div>
-            <label>账号&nbsp;&nbsp;&nbsp;</label>
-            <el-input v-model="account" placeholder="请输入账号/手机号码" clearable style="width:50% "></el-input>
-          </div>
-          <div style="margin-top:25px;">
-            <label>密码&nbsp;&nbsp;&nbsp;</label>
-            <el-input v-model="password" placeholder="请输入密码" show-password style="width:50% "></el-input>
-          </div>
-          <div style="margin-top:25px;"></div>
-          <div style="margin-top:15px;margin-left:60%;">
-            <el-link type="primary" @click="foggetPassword" style="font-size:18px;">忘记密码?</el-link>
-          </div>
-          <div style="margin-top:25px; margin-left:10%">
-            <el-button type="primary" round style="font-size:20px;" @click="login">登录</el-button>
-            <el-button type="primary" round style="font-size:20px;" @click="register">注册</el-button>
-          </div>
-        </div>
-      </div>
-    </div>
+  <div class="background">
+    <div style="width:500px; margin:auto;">
+        <el-tabs v-model="activeName" type="border-card" stretch @tab-click="handleClick" style="margin-top:200px">
+          <el-tab-pane label="账号密码登录" name="first">
+            <div class="logintitle">
+              <span>D&nbsp;a&nbsp;o&nbsp;Y&nbsp;u&nbsp;n</span>
+            </div>
 
-    <!-- 注册界面 -->
-    <el-dialog
-      title="注册账号"
-      :visible.sync="registerFormVisible"
-      :close-on-click-modal="false"
-      width="600px"
-      center
-    >
-      <el-form
-        :model="registerForm"
-        label-width="80px"
-        :rules="registerFormRules"
-        ref="registerForm"
-      >
-        <el-form-item label="账号" prop="account">
-          <el-input
-            v-model="registerForm.account"
-            auto-complete="off"
-            placeholder="请输入账号"
-            style="width:250px;padding-bottom:20px;padding-left:50px"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input
-            v-model="registerForm.password"
-            :maxlength="18"
-            :minlength="18"
-            show-password
-            placeholder="请输入密码"
-            style="width:250px;padding-bottom:20px;padding-left:50px"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="手机" prop="phone">
-          <el-input
-            v-model="registerForm.phone"
-            :maxlength="11"
-            :minlength="11"
-            placeholder="请填写手机号码"
-            style="width:250px;padding-bottom:20px;padding-left:50px"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="验证码" prop="verify">
-          <el-input
-            v-model="registerForm.verify"
-            placeholder="请输入验证码"
-            style="width:150px;padding-bottom:20px;padding-left:50px"
-          ></el-input>
-          <el-button type="primary" v-show="show" @click="getCode">获取验证码</el-button>
-          <el-button type="primary" v-show="!show" class="count" disabled>已发送</el-button>
-          <span v-show="!show" class="count">{{count}} s后可再次获取</span>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click.native="registerFormVisible = false;">取消</el-button>
-        <el-button type="primary" @click.native="registerSubmit">提交</el-button>
-      </div>
-    </el-dialog>
-    <!-- 忘记密码界面1 -->
-    <el-dialog
-      title="忘记密码"
-      :visible.sync="forgetpasswordFormVisible"
-      :close-on-click-modal="false"
-      width="600px"
-      center
-    >
-      <el-form
-        :model="forgetpasswordForm"
-        label-width="80px"
-        :rules="forgetpasswordFormRules"
-        ref="forgetpasswordForm"
-      >
-        <el-form-item label="账号" prop="account">
-          <el-input
-            v-model="forgetpasswordForm.account"
-            auto-complete="off"
-            placeholder="请输入账号"
-            style="width:250px;padding-bottom:20px;padding-left:50px"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="手机" prop="phone">
-          <el-input
-            v-model="forgetpasswordForm.phone"
-            :maxlength="11"
-            :minlength="11"
-            placeholder="请填写手机号码"
-            style="width:250px;padding-bottom:20px;padding-left:50px"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="验证码" prop="verify">
-          <el-input
-            v-model="forgetpasswordForm.verify"
-            placeholder="请输入验证码"
-            style="width:150px;padding-bottom:20px;padding-left:50px"
-          ></el-input>
-          <el-button type="primary" v-show="show1" @click="getCode1">获取验证码</el-button>
-          <el-button type="primary" v-show="!show1" class="count" disabled>已发送</el-button>
-          <span v-show="!show1" class="count">{{count1}} s后可再次获取</span>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click.native="forgetpasswordFormVisible = false;">取消</el-button>
-        <el-button type="primary" @click.native="forgetpasswordNext">下一步</el-button>
-      </div>
-    </el-dialog>
+            <el-form ref="form" :model="form" :rules="rules" label-width="80px" >
+              <!-- <el-form-item label="账号" prop="account">
+                <el-input v-model="form.account" placeholder="输入手机/邮箱" clearable></el-input>
+              </el-form-item> -->
 
-    <!-- 重置密码界面 -->
-    <el-dialog
-      title="重置密码"
-      :visible.sync="resetpasswordFormVisible"
-      :close-on-click-modal="false"
-      width="600px"
-      center
-    >
-      <el-form
-        :model="resetpasswordForm"
-        label-width="150px"
-        :rules="resetpasswordFormRules"
-        ref="resetpasswordForm"
-      >
-        <el-form-item label="请输入新密码" prop="newpassword">
-          <el-input
-            v-model="resetpasswordForm.newpassword"
-            :maxlength="18"
-            :minlength="18"
-            show-password
-            placeholder="请输入密码"
-            style="width:250px;padding-bottom:20px;padding-left:50px"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="请确认新密码" prop="newpassword1">
-          <el-input
-            v-model="resetpasswordForm.newpassword1"
-            :maxlength="18"
-            :minlength="18"
-            show-password
-            placeholder="请输入密码"
-            style="width:250px;padding-bottom:20px;padding-left:50px"
-          ></el-input>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click.native="resetpasswordFormVisible = false;">取消</el-button>
-        <el-button type="primary" @click.native="forgetpasswordSubmit">提交</el-button>
+              <el-form-item label="账号" prop="account">
+                <el-autocomplete
+                  v-model="form.account"
+                  :fetch-suggestions="querySearch"
+                  placeholder="输入手机/邮箱"
+                  @select="handleSelect"
+                  style="width:300px"
+                ></el-autocomplete>
+              </el-form-item>
+
+              <el-form-item label="密码" prop="password">
+                <el-input  v-model="form.password" placeholder="输入密码" clearable show-password style="width:300px"></el-input>
+              </el-form-item>
+
+              
+
+              <el-form-item type="flex"> 
+                <el-col :span="10">
+                  <el-checkbox v-model="form.autoLogin" label="30天自动登陆" name="autoLogin"></el-checkbox>
+                </el-col>
+                <el-col :span="8">
+                  <el-link href="/ChangePassword" :underline="false" style="float:right">忘记密码</el-link>
+                </el-col>
+              </el-form-item>
+              
+              <el-form-item>
+                <div>
+                  <el-button type="primary" @click="submitForm('form')" style="width:300px">登录</el-button>
+                </div>
+                <div>
+                  <el-link href="/Sinup" :underline="false" style="margin:20px 0 0 100px">注册新账号</el-link>
+                </div>
+                
+              </el-form-item>
+            </el-form>
+
+          </el-tab-pane>
+          <el-tab-pane label="短信验证登录" disabled name="second">
+            短信验证登录
+
+          </el-tab-pane>
+        </el-tabs>
       </div>
-    </el-dialog>
   </div>
+
 </template>
 
-
 <script>
-export default {
-  name: "Login",
-  data() {
-    return {
-      show: true,
-      show1: true,
-      count: "",
-      count1: "",
-      timer: null,
-      timer1: null,
-      registerFormVisible: false,
-      forgetpasswordFormVisible: false,
-      resetpasswordFormVisible: false,
-      account: "",
-      password: "",
-      grade: 1,
-      registerFormRules: {
-        account: [
-          {
-            required: true,
-            message: "请输入账号",
-            trigger: "change"
+  export default {
+    data() {
+      var validateAccount = (rule, value, callback) => {
+        if (value === '') {
+          callback(new Error('请输入手机号/邮箱'));
+        } else if (value.indexOf("@") != -1) {
+          //邮箱
+          this.form.way = 'email'
+          var reg = /^([a-zA-Z]|[0-9])(\w|-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/;
+          if(!reg.test(value)){
+            callback(new Error('手机号/邮箱格式有误，请重填!'));
+          }else{
+            callback()
           }
-        ],
-        password: [
-          {
-            required: true,
-            message: "请输入密码",
-            trigger: "change"
+        } else {
+          //手机
+          this.form.way = 'phone'
+          if(!(/^1[3456789]\d{9}$/.test(value))){ 
+              callback(new Error("手机号/邮箱格式有误，请重填"));
+          }else{
+            callback()
           }
-        ],
-        phone: [
-          {
-            required: true,
-            message: "请输入手机号码",
-            trigger: "change"
-          }
-        ],
-        verify: [
-          {
-            required: true,
-            message: "请输入验证码",
-            trigger: "change"
-          }
-        ]
-      },
-      forgetpasswordFormRules: {
-        account: [
-          {
-            required: true,
-            message: "请输入账号",
-            trigger: "change"
-          }
-        ],
-        phone: [
-          {
-            required: true,
-            message: "请输入手机号码",
-            trigger: "change"
-          }
-        ],
-        verify: [
-          {
-            required: true,
-            message: "请输入验证码",
-            trigger: "change"
-          }
-        ]
-      },
-      resetpasswordFormRules: {
-        newpassword: [
-          {
-            required: true,
-            message: "请输入密码",
-            trigger: "change"
-          }
-        ],
-        newpassword1: [
-          {
-            required: true,
-            message: "请输入密码",
-            trigger: "change"
-          }
-        ]
-      },
-
-      //编辑界面数据
-      registerForm: {
-        account: "",
-        password: "",
-        phone: "",
-        verify: ""
-      },
-      forgetpasswordForm: {
-        account: "",
-        phone: "",
-        verify: ""
-      },
-      resetpasswordForm: {
-        newpassword: "",
-        newpassword1: ""
-      }
-    };
-  },
-  methods: {
-    login() {
-        try {
-            // TODO:判断账号密码是否正确
-            let token = this.account
-            this.$store.commit('LOGIN_IN', token)
-            this.$router.replace('/')
-        } catch (e) {
-            console.log(e)
         }
+      };
+      return {
+        activeName: 'first',
+        // TODO:保存到localStorage
+        accountHistory: [],
+        form: {
+          account: '',
+          password: '',
+          way: '',
+          autoLogin: false
+        },
+        rules: {
+          account: [
+            { validator: validateAccount, trigger: 'blur' }
+          ],
+          password: [
+            { required: true, message: '请输入密码', trigger: 'blur' },
+            { min: 4, max: 20, message: '长度在 4 到 20 个字符', trigger: 'blur' }
+          ]
+        }
+      };
     },
+    methods: {
+      // 切换登录tab
+      handleClick(tab, event) {
+        console.log(tab, event);
+      },
 
-    foggetPassword() {
-      this.forgetpasswordFormVisible = true;
-      this.$refs["forgetpasswordFormVisible"].resetFields();
-    },
-    forgetpasswordNext() {
-      this.forgetpasswordFormVisible = false;
-      this.resetpasswordFormVisible = true;
-      this.$refs["resetpasswordFormVisible"].resetFields();
-    },
-    register() {
-      this.registerFormVisible = true;
-      this.$refs["registerForm"].resetFields();
-    },
-    registerSubmit: function() {},
-    forgetpasswordSubmit: function() {},
-    getCode() {
-      const TIME_COUNT = 60;
-      if (!this.timer) {
-        this.count = TIME_COUNT;
-        this.show = false;
-        this.timer = setInterval(() => {
-          if (this.count > 0 && this.count <= TIME_COUNT) {
-            this.count--;
+      // 登录账号历史搜索
+      querySearch(queryString, cb) {
+        var accountHistory = this.accountHistory;
+        var results = queryString ? accountHistory.filter(this.createFilter(queryString)) : accountHistory;
+        // 调用 callback 返回建议列表的数据
+        cb(results);
+      },
+      createFilter(queryString) {
+        return (account) => {
+          return (account.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
+        };
+      },
+      //选择历史账号后触发
+      handleSelect(item) {
+        console.log(item);
+      },
+
+
+      
+      submitForm(formName) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+
+            try {
+                const _this = this;
+                this.$axios.post(this.$serverUrl+'/api/login', {
+                  way:this.form.way,
+                  // account:'13111111111',
+                  // password:'admin',
+                  account:this.form.account,
+                  password:this.form.password
+                })
+                .then(function (response) {
+                  console.log(response);
+                  if(response.data.user_id == -1){
+                    console.log('account error');
+                    _this.$message({
+                      showClose: true,
+                      message: '账号不存在',
+                      type: 'error'
+                    });
+                  }else if(response.data.user_id == -2){
+                    console.log('password error');
+                    _this.$message({
+                      showClose: true,
+                      message: '密码错误',
+                      type: 'error'
+                    });
+                  }else{
+                    // 登录成功
+                    console.log('user_id:'+response.data.user_id);
+
+                    let token = {
+                      'user_id':response.data.user_id,
+                      'loginTime':new Date().getTime(),
+                      'autoLogin':_this.form.autoLogin
+                    }
+                    _this.$store.commit('LOGIN_IN', token);
+                    console.log(_this.$store.state.UserToken);
+                    
+                    _this.$router.replace('/');   // 不会留下 history 记录
+                    //_this.$router.push('/');   // 向 history 栈添加一个新的记录
+                    //this.$router.go(-1);   // 后退一步记录，等同于 history.back()
+                    //this.$router.go(1);   // 在浏览器记录中前进一步，等同于 history.forward()
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
+                
+            } catch (e) {
+                console.log(e)
+            }
+
+
+            // alert('submit!');
           } else {
-            this.show = true;
-            clearInterval(this.timer);
-            this.timer = null;
+            console.log('error submit!!');
+            return false;
           }
-        }, 1000);
-      }
+        });
+      },
     },
-    getCode1() {
-      const TIME_COUNT = 60;
-      if (!this.timer1) {
-        this.count1 = TIME_COUNT;
-        this.show1 = false;
-        this.timer1 = setInterval(() => {
-          if (this.count1 > 0 && this.count1 <= TIME_COUNT) {
-            this.count1--;
-          } else {
-            this.show1 = true;
-            clearInterval(this.timer1);
-            this.timer1 = null;
-          }
-        }, 1000);
-      }
+    //初始化页面完成后,再对dom节点进行相关操作
+    mounted() {
     }
-  }
-};
+  };
 </script>
 
-
-<style>
-.background {
-  width: 100%;
-  height: 925px;
-}
-
-.loginblock {
-  background-color: rgba(242, 246, 252, 0.6);
-  width: 30%;
-  height: 50%;
-  position: absolute;
-  top: 60%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  border-radius: 15px;
-  /* filter: alpha(opacity=60);
-  -moz-opacity: 0.6;
-  -khtml-opacity: 0.6;
-  opacity: 0.6;  */
+<style scoped> 
+.background{
+  width: 100%;height: 100%;
+	background-image: url(../../assets/login.jpg);
+	background-size: cover; /* 使图片平铺满整个浏览器（从宽和高的最大需求方面来满足，会使某些部分无法显示在区域中） */
+	position: absolute; /* 不可缺少 */
+	z-index: -1;
+	background-repeat: no-repeat;
+  /* overflow: hidden; */
 }
 
 .logintitle {
@@ -373,19 +216,5 @@ export default {
   font-size: 50px;
   text-align: center;
   margin-top: 15px;
-}
-
-.inputzm {
-  font-size: 28px;
-
-  margin-top: 20px;
-}
-
-.avatar-uploader .el-upload {
-  border: 1px dashed #d9d9d9;
-  border-radius: 6px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
 }
 </style>

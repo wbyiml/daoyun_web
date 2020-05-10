@@ -9,6 +9,7 @@ import UserGrowth from "../views/user/UserGrowth.vue";
 import UserInformation from "../views/user/UserInformation.vue";
 import AccountSecurity from "../views/user/AccountSecurity.vue";
 
+import InitializeUser from "../views/user/InitializeUser.vue";
 import Error403 from "../views/errors/Error403.vue";
 import Error404 from "../views/errors/Error404.vue";
 import Error500 from "../views/errors/Error500.vue";
@@ -103,6 +104,10 @@ export const DynamicRoutes = [
           }
         }
       ]
+  },
+  {
+    path: '/InitializeUser', //注册后初始化用户信息
+    component: InitializeUser
   },
   {
       path: '/Error403', //Forbidden

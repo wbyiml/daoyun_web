@@ -1,5 +1,13 @@
 <template>
   <div>
+    系统参数设置
+    
+    SystemParameterSetting 系统参数   是否集中在系统（默认）参数表
+
+
+
+    （签到）距离   默认  教师签到时重新设置
+
     系统管理员设置日常学习行为以及默认获得的经验值。例如：考勤签到，默认2经验值。
     系统管理员配置出勤的等级及对应的出勤率。
 
@@ -21,7 +29,7 @@
 </template>
 <script type="text/ecmascript-6">
 export default {
-  name: "ExperienceLevelSetting",
+  name: "SystemParameterSetting",
   data(){
     return {}
   }
