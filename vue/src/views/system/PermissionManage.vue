@@ -144,7 +144,6 @@ export default {
           children: 'children',
           label: 'name'
         },
-        lastId: 0,
         
         addPermissionVisible: false,
         addPermissionTitle:'',
@@ -242,7 +241,6 @@ export default {
 
           if(this.operation == 1){ //新增
             let newChild = { 
-              id: ++this.lastId, 
               name: this.addPermissionForm.name, 
               url:this.addPermissionForm.url,
               icon:this.addPermissionForm.icon,
@@ -329,9 +327,6 @@ export default {
             
             // 有parent_id的list转换成带children的树
             while(permissions[0] && permissions[0].parent_id == 0){
-              if(permissions[0].id>_this.lastId){
-                _this.lastId = permissions[0].id;
-              }
               permissions[0].children = [];
               _this.permissionData.push(permissions[0]);
               permissions.splice(0, 1);
@@ -382,9 +377,6 @@ export default {
       let i=0;
       while(list[i]){
         if(list[i].parent_id == treeNode.id){
-          if(list[i].id>this.lastId){
-            this.lastId = list[i].id;
-          }
           list[i].children = [];
           treeNode.children.push(list[i]);
           list.splice(i, 1);
@@ -418,9 +410,6 @@ export default {
         
         // 有parent_id的list转换成带children的树
         while(permissions[0] && permissions[0].parent_id == 0){
-          if(permissions[0].id>_this.lastId){
-            _this.lastId = permissions[0].id;
-          }
           permissions[0].children = [];
           _this.permissionData.push(permissions[0]);
           permissions.splice(0, 1);

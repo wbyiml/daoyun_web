@@ -96,7 +96,7 @@ export default {
           })
           .then(function (response) {
             console.log(response);
-            if(response.data.state == 0){
+            if(response.data.state.length == 0){
               console.log('服务器更新用户信息出错');
               _this.$message({
                 showClose: true,

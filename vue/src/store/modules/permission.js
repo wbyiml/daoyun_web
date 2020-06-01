@@ -31,7 +31,8 @@ export default {
     actions: {
         async FETCH_PERMISSION({ commit}) {
             let permissionList = await fetchPermission()
-
+            console.log('permissionList')
+            console.log(permissionList)
             /*  根据权限筛选出我们设置好的路由并加入到path=''的children */
             let routes = recursionRouter(permissionList, dynamicRouter)
             let MainContainer = DynamicRoutes.find(v => v.path === '')
