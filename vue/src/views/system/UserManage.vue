@@ -40,12 +40,12 @@
     <!-- 用户列表 -->
     <div>
       <el-table
-      :data="UserTableData.filter(data => (!searchName || data.name.toLowerCase().includes(searchName.toLowerCase())) &&
-                                          (!searchIdentity || data.identity.toLowerCase().includes(searchIdentity.toLowerCase())) &&
-                                          (!searchSchoolName || data.school_name.toLowerCase().includes(searchSchoolName.toLowerCase())) &&
-                                          (!searchFacultyName || data.faculty_name.toLowerCase().includes(searchFacultyName.toLowerCase())) &&
-                                          (!searchMajorName || data.major_name.toLowerCase().includes(searchMajorName.toLowerCase())) &&
-                                          (!searchStudentNumber || data.student_number.toLowerCase().includes(searchStudentNumber.toLowerCase())) 
+      :data="UserTableData.filter(data => (!searchName || data.name&&data.name.toLowerCase().includes(searchName.toLowerCase())) &&
+                                          (!searchIdentity || data.identity&&data.identity.toLowerCase().includes(searchIdentity.toLowerCase())) &&
+                                          (!searchSchoolName || data.school_name&&data.school_name.toLowerCase().includes(searchSchoolName.toLowerCase())) &&
+                                          (!searchFacultyName || data.faculty_name&&data.faculty_name.toLowerCase().includes(searchFacultyName.toLowerCase())) &&
+                                          (!searchMajorName || data.major_name&&data.major_name.toLowerCase().includes(searchMajorName.toLowerCase())) &&
+                                          (!searchStudentNumber || data.student_number&&data.student_number.toLowerCase().includes(searchStudentNumber.toLowerCase())) 
                                   )"
       stripe border style="width: 100%"
       >
